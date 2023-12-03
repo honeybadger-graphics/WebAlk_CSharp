@@ -1,0 +1,54 @@
+﻿@page "/fetchdata"
+@using Microsoft.EntityFrameworkCore;
+@using WebAlk_Bead.Data;
+
+
+<PageTitle>Flights</PageTitle>
+@if (planes==null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+<table class='table'>
+    <thead>
+        <tr>
+            <th>Flight Number</th>
+            <th>Callsign</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Airline</th>
+            <th>Plane Name</th>
+            <th>Number of Seats</th>
+            <th>Status</th>
+            
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var plane in planes)
+        {
+            <tr>
+                <td>@plane.Flight.FlightNumber</td>
+                <td>@plane.Callsign</td>
+                <td>@plane.Flight.From</td>
+                <td>@plane.Flight.To</td>
+                <td>@plane.Flight.Airline</td>
+                <td>@plane.PlaneName</td>
+                <td>@plane.NumberOfSeats</td>
+                <td>@plane.Flight.Status</td>
+            </tr>
+        }
+    </tbody>
+</table>
+}
+
+@code{
+    List<Plane> planes = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var db = new DatabaseContext();
+        planes = db.Planes.Include(f => f.Flight).ToList();
+    }
+}
+

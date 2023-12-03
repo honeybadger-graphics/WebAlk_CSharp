@@ -1,0 +1,280 @@
+﻿@page "/plane"
+@using WebAlk_Bead.Data;
+
+<PageTitle>CRUD Plane Operation</PageTitle>
+
+<EditForm Model="@flightInput" Context="FlightForm" OnValidSubmit="@CheckFlight">
+    <DataAnnotationsValidator />
+    <h3>Create Plane for Flight</h3>
+    <div class="form-group row">
+        <label for="FlightNumber" class="col-sm-2 col-form-label">
+            Flight Number
+        </label>
+        <div class="col-sm-10">
+            <InputText id="FlightNumber" class="form-control" placeholder="Flight Number"
+            @bind-Value="@flightInput.FlightNumber" />
+            <ValidationMessage For="() => flightInput.FlightNumber" />
+        </div>
+    </div>
+    <button hidden="@hideButton" type="submit" class="btn btn-primary">Check Flight</button>
+    @createResponse
+</EditForm>
+@if (createCanContinue)
+{
+    <EditForm Model="@planeInput" Context="PlaneForm" OnValidSubmit="@CreatePlane">
+        <DataAnnotationsValidator />
+        <div class="form-group row">
+            <label for="PlaneName" class="col-sm-2 col-form-label">
+                Plane Name
+            </label>
+            <div class="col-sm-10">
+                <InputText id="PlaneName" class="form-control" placeholder="Plane Name"
+                @bind-Value="planeInput.PlaneName" />
+                <ValidationMessage For="() => planeInput.PlaneName" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="Callsign" class="col-sm-2 col-form-label">
+                Callsign
+            </label>
+            <div class="col-sm-10">
+                <InputText id="Callsign" class="form-control" placeholder="Callsign"
+                @bind-Value="planeInput.Callsign" />
+                <ValidationMessage For="() => planeInput.Callsign" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="NumberOfSeats" class="col-sm-2 col-form-label">
+                Number of seats
+            </label>
+            <div class="col-sm-10">
+                <InputNumber id="NumberOfSeats" class="form-control" placeholder="2-999"
+                @bind-Value="planeInput.NumberOfSeats" />
+                <ValidationMessage For="() => planeInput.NumberOfSeats" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="NumberOfCrew" class="col-sm-2 col-form-label">
+                Number of crew
+            </label>
+            <div class="col-sm-10">
+                <InputNumber id="NumberOfCrew" class="form-control" placeholder="2-9"
+                @bind-Value="planeInput.NumberOfCrew" />
+                <ValidationMessage For="() => planeInput.NumberOfCrew" />
+            </div>
+        </div> 
+       
+    <button type="submit" class="btn btn-primary">Create Plane</button>
+    </EditForm>
+   
+}
+<EditForm Model="@planeInput" OnValidSubmit="@ReadPlane">
+    <DataAnnotationsValidator />
+    <h3>Read Plane Type </h3>
+    <div class="form-group row">
+        <label for="PlaneName" class="col-sm-2 col-form-label">
+            Plane Name
+        </label>
+        <div class="col-sm-10">
+            <InputText id="PlaneName" class="form-control" placeholder="Plane Name"
+            @bind-Value="planeInput.PlaneName" />                   
+            <ValidationMessage For="() => planeInput.PlaneName" />
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Read Plane</button>
+    @if (planes.Count == 0)
+    {
+        if (responseRead == 1)
+        {
+        }
+        else
+        {
+            <div>There are no Planes that matches the criteria.</div>
+        }
+
+    }
+    else
+    {
+        <table class='table'>
+            <thead>
+                <tr>
+                    <th>Plane Name</th>
+                    <th>Callsign</th>
+                    <th>Number of Crew</th>
+                    <th>Number of Seat</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var plane in planes)
+                {
+                    <tr>
+                        <td>@plane.PlaneName</td>
+                        <td>@plane.Callsign</td>
+                        <td>@plane.NumberOfCrew</td>
+                        <td>@plane.NumberOfSeats</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    
+</EditForm>
+<EditForm Model="@planeInput" OnValidSubmit="@UpdatePlane" >
+    <DataAnnotationsValidator />
+    <h3>Update Plane Number of Crew</h3>
+    <div class="form-group row">
+        <label for="Callsign" class="col-sm-2 col-form-label">
+            Callsign
+        </label>
+        <div class="col-sm-10">
+            <InputText id="Callsign" class="form-control" placeholder="Callsign"
+            @bind-Value="planeInput.Callsign" />                    
+            <ValidationMessage For="() => planeInput.Callsign" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="NumberOfCrew" class="col-sm-2 col-form-label">
+            Number of Crew
+        </label>
+        <div class="col-sm-10">
+            <InputNumber id="NumberOfCrew" class="form-control" placeholder="2-9"
+            @bind-Value="planeInput.NumberOfCrew" />
+            <ValidationMessage For="() => planeInput.NumberOfCrew" />
+
+        </div>
+    </div>
+    @updateResponse
+    <button type="submit" class="btn btn-primary">Update Plane</button>
+</EditForm>
+
+
+<EditForm Model="@planeInput" OnValidSubmit="@DeletePlane">
+    <DataAnnotationsValidator />
+    <h3>Delete Planet</h3>
+    <div class="form-group row">
+        <label for="Callsign" class="col-sm-2 col-form-label">
+            Callsign
+        </label>
+        <div class="col-sm-10">
+            <InputText id="Callsign" class="form-control" placeholder="Callsign"
+            @bind-Value="planeInput.Callsign" />
+            <ValidationMessage For="() => planeInput.Callsign" />
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Delete Plane</button>
+</EditForm>
+
+
+
+@code {
+    Flight flightInput = new();
+    Plane planeInput = new();
+    private RenderFragment createResponse =@<div></div>;
+    private RenderFragment updateResponse =@<div></div>;
+    List<Plane> planes = new();
+    bool createCanContinue;
+    bool hideButton = false;
+    int responseRead = 1;
+    private void CheckFlight()
+    {
+        using var db = new DatabaseContext();
+        Console.WriteLine("Checking for Flight!");
+        createCanContinue = db.Flights.Any(f => f.FlightNumber == flightInput.FlightNumber);
+        if (createCanContinue)
+        {
+            hideButton = true;
+            Console.WriteLine("Found!");
+        }
+        else
+        {
+            flightInput = new();
+            planeInput = new();
+            hideButton = false;
+            createResponse = @<div>No such flight with this Flight Number.</div>;
+            Console.WriteLine("There is no Flight with FlightNumber {0}", planeInput.Flight.FlightNumber);
+        }
+
+    }
+    private void CreatePlane()
+    {
+        using var db = new DatabaseContext();
+        Console.WriteLine("Trying to insert a Plane for Flight");
+        var flight = db.Flights.FirstOrDefault(f => f.FlightNumber == flightInput.FlightNumber);
+        if (!db.Planes.Any(p => p.Callsign == planeInput.Callsign))
+        {
+            flight.Planes.Add(planeInput);
+            db.SaveChanges();
+            createResponse = @<div>Plane succesfully added for the flight.</div>;
+            Console.WriteLine(planeInput.ToString() + "succefully added for " + flightInput.FlightNumber);
+        }
+        else
+        {
+            createResponse = @<div>Plane with this callsign allready registerd.</div>;
+            Console.WriteLine("There is allready another plane with this callsign {0}", flightInput.FlightNumber);
+        }
+        flightInput = new();
+        planeInput = new();
+        createCanContinue = false ;
+    }
+    private void ReadPlane()
+    {
+        using var db = new DatabaseContext();
+        Console.WriteLine("Querrying");
+        Console.WriteLine(db.Planes.Any(p => p.PlaneName == planeInput.PlaneName));
+        if (db.Planes.Any(p => p.PlaneName == planeInput.PlaneName))
+        {
+
+            responseRead = 1;
+            planes = db.Planes.Where(p => p.PlaneName == planeInput.PlaneName).ToList();
+            Console.WriteLine("Found planes with name {0} count: {1}", planeInput.PlaneName, planes.Count);
+
+        }
+        else
+        {
+            planes.Clear();
+            Console.WriteLine("No such plane(s)");
+            responseRead = 0;
+        }
+        flightInput = new();
+        planeInput = new();
+    }
+    private void UpdatePlane()
+    {
+        using var db = new DatabaseContext();
+        Console.WriteLine("Update Plane Crew number on {0}", planeInput.Callsign);
+        if (db.Planes.Any(p => p.Callsign == planeInput.Callsign))
+        {
+            var plane = db.Planes.FirstOrDefault(p => p.Callsign == planeInput.Callsign);
+            plane.NumberOfCrew = planeInput.NumberOfCrew;
+            db.SaveChanges();
+            Console.WriteLine("Update Succesfull on {0} numberOfCrew: {1}", planeInput.Callsign, planeInput.NumberOfCrew);
+            updateResponse = @<div>Update Succesfull</div>;
+        }
+        else
+        {
+            Console.WriteLine("There is no such Plane!");
+            updateResponse = @<div>There is no such Plane!</div>;
+        }
+        flightInput = new();
+        planeInput = new();
+
+    }
+    private void DeletePlane()
+    {
+        using var db = new DatabaseContext();
+        Console.WriteLine("Delete Plane on {0}", planeInput.Callsign);
+        if (db.Planes.Any(p => p.Callsign == planeInput.Callsign))
+        {
+            var plane = db.Planes.FirstOrDefault(p => p.Callsign == planeInput.Callsign);
+            db.Planes.Remove(plane);
+            db.SaveChanges();
+            Console.WriteLine("Delete Succesfull on {0}", planeInput.Callsign);
+        }
+        else
+        {
+            Console.WriteLine("There is no such plane!");
+        }
+        flightInput = new();
+        planeInput = new();
+    }
+}

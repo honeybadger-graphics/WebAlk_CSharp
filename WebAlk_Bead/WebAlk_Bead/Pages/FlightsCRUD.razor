@@ -1,0 +1,279 @@
+﻿@page "/flight"
+@using WebAlk_Bead.Data;
+<PageTitle>CRUD Flight Operation</PageTitle>
+
+
+<EditForm Model="@flightInput" OnValidSubmit="@CreateFlight">
+    <DataAnnotationsValidator/>
+    <h3>Create Flight</h3>
+    <div class="form-group row">
+        <label for="FLightNumber" class="col-sm-2 col-form-label">
+            Flight Number
+        </label>
+        <div class="col-sm-10">
+            <InputText id="FLightNumber" class="form-control" placeholder="Flight Number"
+            @bind-Value="flightInput.FlightNumber" />
+            <ValidationMessage For="() => flightInput.FlightNumber" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="From" class="col-sm-2 col-form-label">
+            From
+        </label>
+        <div class="col-sm-10">
+            <InputText id="From" class="form-control" placeholder="ABC"
+            @bind-Value="flightInput.From" />
+            <ValidationMessage For="() => flightInput.From" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="To" class="col-sm-2 col-form-label">
+            To
+        </label>
+        <div class="col-sm-10">
+            <InputText id="To" class="form-control" placeholder="XYZ"
+            @bind-Value="flightInput.To" />
+            <ValidationMessage For="() => flightInput.To" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="Gate" class="col-sm-2 col-form-label">
+            Gate
+        </label>
+        <div class="col-sm-10">
+            <InputText id="Gate" class="form-control" placeholder="G-XX"
+            @bind-Value="flightInput.Gate" />
+            <ValidationMessage For="() => flightInput.Gate" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="Airline" class="col-sm-2 col-form-label">
+            Airline
+        </label>
+        <div class="col-sm-10">
+            <InputText id="Airline" class="form-control" placeholder="Airline"
+            @bind-Value="flightInput.Airline" />
+        </div>
+    </div>
+    @createResponse
+    <button type="submit" class="btn btn-primary">Create Flight</button>
+</EditForm>
+
+
+
+<EditForm Model="@flightInput" OnValidSubmit="@ReadFlight">
+    <DataAnnotationsValidator/>
+    <h3>Read Flight </h3>
+    <div class="form-group row">
+        <label for="From" class="col-sm-2 col-form-label">
+            From
+        </label>
+        <div class="col-sm-10">
+            <InputText id="From" class="form-control" placeholder="ABC"
+            @bind-Value="flightInput.From" />
+            <ValidationMessage For="() => flightInput.From" />
+
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="To" class="col-sm-2 col-form-label">
+            To
+        </label>
+        <div class="col-sm-10">
+            <InputText id="To" class="form-control" placeholder="XYZ"
+            @bind-Value="flightInput.To" />
+            <ValidationMessage For="() => flightInput.To" />
+
+        </div>
+    </div>
+    @if (flights.Count == 0)
+    {
+        if (responseRead == 1)
+        {
+        }
+        else
+        {
+            <div>There are no Flights that matches the criteria.</div>
+        }
+
+    }
+    else
+    {
+        <table class='table'>
+            <thead>
+                <tr>
+                    <th>Flight Number</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Airline</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var flight in flights)
+                {
+                    <tr>
+                        <td>@flight.FlightNumber</td>
+                        <td>@flight.From</td>
+                        <td>@flight.To</td>
+                        <td>@flight.Airline</td>
+                        <td>@flight.Status</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    <button type="submit" class="btn btn-primary">Read Flight</button>
+
+</EditForm>
+
+
+<EditForm Model="@flightInput" OnValidSubmit="@UpdateFlight">
+    <DataAnnotationsValidator />
+    <h3>Update Flight Status</h3>
+    <div class="form-group row">
+        <label for="FLightNumber" class="col-sm-2 col-form-label">
+            Flight Number
+        </label>
+        <div class="col-sm-10">
+            <InputText id="FLightNumber" class="form-control" placeholder="Flight Number"
+            @bind-Value="flightInput.FlightNumber" />
+            <ValidationMessage For="() => flightInput.FlightNumber" />
+
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="Status" class="col-sm-2 col-form-label">
+            Status
+        </label>
+        <div class="col-sm-10">
+            <InputSelect @bind-Value="flightInput.Status" class="form-control" placeholder="Status">
+                @foreach (var status in Statuses)
+                {
+
+                    <option value="@status">@status</option>
+                }
+            </InputSelect>
+        </div>
+    </div>
+    @updateResponse
+    <button type="submit" class="btn btn-primary">Update Flight</button>
+
+</EditForm>
+
+<EditForm Model="@flightInput" OnValidSubmit="@DeleteFlight">
+    <DataAnnotationsValidator />
+    <h3>Delete Flight</h3>
+    <div>Make sure the Flight does not have a linked Plane.</div>
+    <div class="form-group row">
+        <label for="FLightNumber" class="col-sm-2 col-form-label">
+            Flight Number
+        </label>
+        <div class="col-sm-10">
+            <InputText id="FLightNumber" class="form-control" placeholder="Flight Number"
+            @bind-Value="flightInput.FlightNumber" />
+            <ValidationMessage For="() => flightInput.FlightNumber" />
+
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Delete Flight</button>
+</EditForm>
+
+
+
+
+
+@code {
+    List<string> Statuses = new List<string> {"Boarding", "Landing", "Taxiing", "Flying", "Descending", "Ascending", "Delayed", "Cancelled" };
+    Flight flightInput = new();
+    private RenderFragment createResponse =@<div></div>;
+    private RenderFragment updateResponse =@<div></div>;
+    List<Flight> flights = new();
+    int responseRead = 1;
+    private void CreateFlight()
+    {
+        using var db = new DatabaseContext();
+
+        Console.WriteLine("Trying to insert a new Flight");
+        if (!db.Flights.Any(f => f.FlightNumber == flightInput.FlightNumber))
+        {
+            db.Add(flightInput);
+            db.SaveChanges();
+            createResponse = @<div>Flight succesfully created.</div>;
+            Console.WriteLine(flightInput.ToString());
+        }
+        else
+        {
+            createResponse = @<div>Existing Flight with this Flight Number.</div>;
+            Console.WriteLine("There is allready a Flight with FlightNumber {0}", flightInput.FlightNumber);
+        }
+        flightInput = new();
+    }
+    private void ReadFlight()
+    {
+        using var db = new DatabaseContext();
+        Console.WriteLine("Querrying");
+        if (db.Flights.Any(f => f.From == flightInput.From && f.To == flightInput.To))
+        {
+
+            responseRead = 1;
+            flights = db.Flights.Where(f => f.From == flightInput.From && f.To == flightInput.To).ToList();
+            Console.WriteLine("Found flights from: {0} to: {1} number: {2}", flightInput.From, flightInput.To, flights.Count);
+
+        }
+        else
+        {
+            flights.Clear();
+            Console.WriteLine("No such flight(s)");
+            responseRead = 0;
+        }
+        flightInput = new();
+    }
+    private void UpdateFlight()
+    {
+        using var db = new DatabaseContext();
+        Console.WriteLine("Update Flight Status on {0}", flightInput.FlightNumber);
+        if (db.Flights.Any(f => f.FlightNumber == flightInput.FlightNumber))
+        {
+            var flight = db.Flights.FirstOrDefault(f => f.FlightNumber == flightInput.FlightNumber);
+            if (flightInput.Status == null)
+            {
+                flight.Status = Statuses.First();
+                flightInput.Status = Statuses.First();
+            }
+            else
+            {
+                flight.Status = flightInput.Status;
+            }
+  
+            db.SaveChanges();
+            Console.WriteLine("Update Succesfull on {0} status: {1}", flightInput.FlightNumber, flightInput.Status);
+            updateResponse = @<div>Update Succesfull</div>;
+        }
+        else
+        {
+            Console.WriteLine("There is no such flight!");
+            updateResponse = @<div>There is no such flight!</div>;
+        }   
+        flightInput = new();
+    }
+    private void DeleteFlight()
+    {
+        using var db = new DatabaseContext();
+        Console.WriteLine("Delete Flight on {0}", flightInput.FlightNumber);
+        if (db.Flights.Any(f => f.FlightNumber == flightInput.FlightNumber))
+        {
+            var flight = db.Flights.FirstOrDefault(f => f.FlightNumber == flightInput.FlightNumber);
+            db.Flights.Remove(flight);
+            db.SaveChanges();
+            Console.WriteLine("Delete Succesfull on {0}", flightInput.FlightNumber);
+           
+        }
+        else
+        {
+            Console.WriteLine("There is no such flight!");
+            
+        }
+        flightInput = new();
+    }
+}

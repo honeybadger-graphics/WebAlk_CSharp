@@ -1,0 +1,75 @@
+﻿@page "/"
+@using System.Collections.Concurrent;
+@using WebAlk_Bead.Data
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, Enthusiast!</h1>
+
+Welcome to my new (tiny) database. It can be improved upon, but it is a start.
+
+<p>First, make sure there is a database to put things into.</p>
+@if (!isDatabaseFound)
+{
+    <div>If you can see this that means there is no DB to put things into. Make sure it is created.</div>
+}
+else 
+{
+    if (dataCreated)
+    {
+        <div>Looks like you already have data in DB.</div>
+        
+    }
+    else
+    {
+        <h2 hidden="@dataCreated">Want to put dummy data into DB?</h2>
+        <button hidden="@dataCreated" class="btn btn-primary" onclick="@PopulateWithData">Dummy Data</button>
+    }
+}
+@code{
+    bool isDatabaseFound = false;
+    bool dataCreated = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var folder = Environment.SpecialFolder.LocalApplicationData;
+        var path = Environment.GetFolderPath(folder);
+        using var db = new DatabaseContext();
+        if (System.IO.File.Exists(System.IO.Path.Join(path, "flights.db")))
+        { 
+            isDatabaseFound = true;
+        }
+        else
+        {
+            isDatabaseFound = false;
+        }
+        if (db.Flights.Count()!=0)
+        {
+            dataCreated = true;
+        }
+    }
+
+    public void PopulateWithData()
+    {
+        IList<Plane> planeList = new List<Plane>(){ new Plane() { PlaneName="A380",Callsign="DL-10",NumberOfCrew=4,NumberOfSeats=238,FlightId=1 },
+                                                    new Plane() { PlaneName="B787D",Callsign="BRA-12",NumberOfCrew=5,NumberOfSeats=357,FlightId=2 },
+                                                    new Plane() { PlaneName="B777",Callsign="LF-10",NumberOfCrew=7,NumberOfSeats=301,FlightId=3 },
+                                                    new Plane() { PlaneName="DC10",Callsign="DL-22",NumberOfCrew=5,NumberOfSeats=250,FlightId=4 },
+                                                    new Plane() { PlaneName="A380",Callsign="EMR-12",NumberOfCrew=9,NumberOfSeats=275,FlightId=5 },
+                                                    new Plane() { PlaneName="B787D",Callsign="SCDALS-01",NumberOfCrew=4,NumberOfSeats=342,FlightId=6 },
+                                                  };
+        IList<Flight> flightList = new List<Flight>() { new Flight() { FlightId = 1, FlightNumber = "FF-101", From = "BUD", To = "LAX", Gate = "G-01", Airline = "Delta" },
+                                                        new Flight() { FlightId = 2, FlightNumber = "LA-1141", From = "LAX", To = "LHR", Gate = "G-14", Airline = "Brithis Airways" },
+                                                        new Flight() { FlightId = 3, FlightNumber = "LUF-121", From = "JFK", To = "DXB", Gate = "G-05", Airline = "Lufthansa" },
+                                                        new Flight() { FlightId = 4, FlightNumber = "FD-202", From = "LHR", To = "BUD", Gate = "G-08", Airline = "Delta" },
+                                                        new Flight() { FlightId = 5, FlightNumber = "ER-1221", From = "DXB", To = "LAX", Gate = "G-10", Airline = "Emirates" },
+                                                        new Flight() { FlightId = 6, FlightNumber = "SD-122", From = "BUD", To = "LAX", Gate = "G-02", Airline = "Scandinavian Airlines" }
+                                                      };
+
+        using var db = new DatabaseContext();
+        db.Flights.AddRange(flightList);
+        db.Planes.AddRange(planeList);
+        db.SaveChanges();
+        dataCreated = true;
+        Console.WriteLine("Dump Success");
+    }
+}

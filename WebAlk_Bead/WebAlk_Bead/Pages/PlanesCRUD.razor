@@ -161,7 +161,7 @@
             <ValidationMessage For="() => planeInput.Callsign" />
         </div>
     </div>
-    <button type="submit" class="btn btn-primary">Delete Plane</button>
+    <button type="submit" class="btn btn-danger">Delete Plane</button>
 </EditForm>
 
 
@@ -188,11 +188,11 @@
         else
         {
             flightInput = new();
-            planeInput = new();
             hideButton = false;
             createResponse = @<div>No such flight with this Flight Number.</div>;
             Console.WriteLine("There is no Flight with FlightNumber {0}", planeInput.Flight.FlightNumber);
         }
+        planeInput = new();
 
     }
     private void CreatePlane()

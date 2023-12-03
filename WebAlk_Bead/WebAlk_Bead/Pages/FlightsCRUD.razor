@@ -176,7 +176,7 @@
 
         </div>
     </div>
-    <button type="submit" class="btn btn-primary">Delete Flight</button>
+    <button type="submit" class="btn btn-danger">Delete Flight</button>
 </EditForm>
 
 
@@ -247,7 +247,7 @@
             }
   
             db.SaveChanges();
-            Console.WriteLine("Update Succesfull on {0} status: {1}", flightInput.FlightNumber, flightInput.Status);
+            Console.WriteLine("Update Succesfull on {0} status: {1} ", flightInput.FlightNumber, flightInput.Status);
             updateResponse = @<div>Update Succesfull</div>;
         }
         else
